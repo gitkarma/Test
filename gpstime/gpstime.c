@@ -93,8 +93,7 @@ int main()
 		}
 
 		sleep(GPSTIME_UPDATE_DELAY_SEC);
-        break;
-	}while(1);
+	}while(0);
 
 	return 0;
 
