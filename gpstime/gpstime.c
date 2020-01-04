@@ -60,7 +60,7 @@ int main()
 
 		if (update_gps_data(&gps_data)) {
 #ifdef GPSTIME_DEBUG
-			printf("Waiting..\n");
+			fprintf(stderr,"Waiting..\n");
 #endif
 			sleep(GPSTIME_UPDATE_RETRY_DELAY_SEC);
 			continue;
@@ -73,7 +73,7 @@ int main()
 			isnan(gps_time_dbl) ||
 			!(gps_data.set | TIME_SET)) {
 #ifdef GPSTIME_DEBUG
-			printf("GPS not yet ready\n");
+			fprintf(stderr,"GPS not yet ready\n");
 #endif
 			sleep(GPSTIME_UPDATE_RETRY_DELAY_SEC);
 			continue;
@@ -84,15 +84,19 @@ int main()
 		now.tv_sec = (__time_t) strtoul(gps_time_buff, NULL, 0);
 
 #ifdef GPSTIME_DEBUG
-			printf("Epoch Time : %lu\n", now.tv_sec);
+			fprintf(stderr,"Epoch Time : %lu\n", now.tv_sec);
 #endif
 
 		ret = settimeofday(&now, NULL);
 		if (ret < 0) {
 			perror("Failed to set the system time");
+
 		}
 
 		sleep(GPSTIME_UPDATE_DELAY_SEC);
+        if(ret < 0){
+            continue;
+        }
 	}while(0);
 
 	return 0;
