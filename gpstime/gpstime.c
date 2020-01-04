@@ -11,7 +11,7 @@
 #define GPSTIME_GPSD_PORT				"2947"
 #define GPSTIME_GPSD_WAIT_MAX_MS		500 * 1000
 #define GPSTIME_UPDATE_DELAY_SEC		5
-#define GPSTIME_UPDATE_RETRY_DELAY_SEC	5
+#define GPSTIME_UPDATE_RETRY_DELAY_SEC	1
 #define GPSTIME_WAIT_ERRNO				-99
 
 #define GPSTIME_DEBUG
@@ -43,7 +43,6 @@ int main()
 	struct timeval now;
 
 	struct gps_data_t gps_data;
-    int count = 3;
 
 //	daemon(0, 0);
 
@@ -57,11 +56,11 @@ int main()
 
 	memset(&now, 0, sizeof(now));
 
-	do {
+	while (1) {
 
 		if (update_gps_data(&gps_data)) {
 #ifdef GPSTIME_DEBUG
-			fprintf(stderr,"Waiting..\n");
+			printf("Waiting..\n");
 #endif
 			sleep(GPSTIME_UPDATE_RETRY_DELAY_SEC);
 			continue;
@@ -74,7 +73,7 @@ int main()
 			isnan(gps_time_dbl) ||
 			!(gps_data.set | TIME_SET)) {
 #ifdef GPSTIME_DEBUG
-			fprintf(stderr,"GPS not yet ready\n");
+			printf("GPS not yet ready\n");
 #endif
 			sleep(GPSTIME_UPDATE_RETRY_DELAY_SEC);
 			continue;
@@ -85,25 +84,19 @@ int main()
 		now.tv_sec = (__time_t) strtoul(gps_time_buff, NULL, 0);
 
 #ifdef GPSTIME_DEBUG
-			fprintf(stderr,"Epoch Time : %lu\n", now.tv_sec);
+			printf("Epoch Time : %lu\n", now.tv_sec);
 #endif
 
 		ret = settimeofday(&now, NULL);
 		if (ret < 0) {
-            fprintf(stderr,"failed to set system time\n");
 			perror("Failed to set the system time");
-
 		}
-        else {
-            break;
-        }
+		else {
+		   break;
+		}
 
 		sleep(GPSTIME_UPDATE_DELAY_SEC);
-
-        if(count--){
-            continue;
-        }
-	}while(0);
+	}
 
 	return 0;
 
