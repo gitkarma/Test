@@ -94,6 +94,9 @@ int main()
 			perror("Failed to set the system time");
 
 		}
+        else {
+            break;
+        }
 
 		sleep(GPSTIME_UPDATE_DELAY_SEC);
 
