@@ -11,7 +11,7 @@
 #define GPSTIME_GPSD_PORT				"2947"
 #define GPSTIME_GPSD_WAIT_MAX_MS		500 * 1000
 #define GPSTIME_UPDATE_DELAY_SEC		5
-#define GPSTIME_UPDATE_RETRY_DELAY_SEC	1
+#define GPSTIME_UPDATE_RETRY_DELAY_SEC	5
 #define GPSTIME_WAIT_ERRNO				-99
 
 #define GPSTIME_DEBUG
@@ -43,6 +43,7 @@ int main()
 	struct timeval now;
 
 	struct gps_data_t gps_data;
+    int count = 3;
 
 //	daemon(0, 0);
 
@@ -89,12 +90,14 @@ int main()
 
 		ret = settimeofday(&now, NULL);
 		if (ret < 0) {
+            fprintf(stderr,"failed to set system time\n");
 			perror("Failed to set the system time");
 
 		}
 
 		sleep(GPSTIME_UPDATE_DELAY_SEC);
-        if(ret < 0){
+
+        if(count--){
             continue;
         }
 	}while(0);
